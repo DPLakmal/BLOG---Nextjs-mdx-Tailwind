@@ -1,0 +1,24 @@
+---
+title: "How to create a .MDX file🔥 "
+date: 'August 4, 2021'
+cover_image: "https://developer.apple.com/news/images/og/wwdc22/wwdc22-og-v3.jpg"
+sample_body: "Hello guys!! Recently, while working on a project, I came accross a situation where I needed to implement Drag and drop feature for uploading files to the server. But, the problem was that, the (component) file in which I was working was already large, so I wanted to somehow separate the drag and drop logic from my component logic, and I ended up creating a `useDragAndDrop()` hook."
+---
+
+Hello guys!!
+Recently, while working on a project, I came accross a situation where I needed to implement Drag and drop feature for uploading files to the server. But, the problem was that, the (component) file in which I was working was already large, so I wanted to somehow separate the drag and drop logic from my component logic, and I ended up creating a `useDragAndDrop()` hook.<br />
+
+In this article, I want to share exactly, how I created a custom hook for drag and drop feature. <br />
+
+So, let's build it!! 🔥
+
+Let me show you the end result of what we will be building.
+![ezgif-4-7bd93a6caeeb.gif](https://cdn.hashnode.com/res/hashnode/image/upload/v1629355307932/lfGrCKLeu.gif)
+
+### Initialize a React Project.
+
+`npx create-react-app drag-and-drop-react --template typescript`
+
+After the project is initialized, let's create a form in App.js.
+
+

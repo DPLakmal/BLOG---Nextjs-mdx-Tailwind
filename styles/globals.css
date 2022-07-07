@@ -1,16 +1,12 @@
-html,
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
 body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-* {
-  box-sizing: border-box;
+    background-color: var(--whitegrey);
+    background: url(../images/bg-svg.svg) no-repeat 0 0;
+    background-size: cover;
+    background-attachment: fixed
 }

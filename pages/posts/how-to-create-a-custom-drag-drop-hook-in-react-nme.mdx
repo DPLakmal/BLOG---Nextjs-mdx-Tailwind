@@ -1,0 +1,329 @@
+---
+title: "මෙවර Apple WWDC 22 event එක ජූනි මස 6 වැනි දින සිට 10 දක්වා පැවැත්වීමට Apple සමාගම කටයුතු කරයි"
+cover_image: "https://9to5mac.com/wp-content/uploads/sites/6/2021/05/wwdc.jpg?quality=82&strip=all&w=1600"
+sample_body: "Hello guys!! Recently, while working on a project, I came accross a situation where I needed to implement Drag and drop feature for uploading files to the server. But, the problem was that, the (component) file in which I was working was already large, so I wanted to somehow separate the drag and drop logic from my component logic, and I ended up creating a `useDragAndDrop()` hook."
+---
+
+Hello guys!!
+Recently, while working on a project, I came accross a situation where I needed to implement Drag and drop feature for uploading files to the server. But, the problem was that, the (component) file in which I was working was already large, so I wanted to somehow separate the drag and drop logic from my component logic, and I ended up creating a `useDragAndDrop()` hook.<br />
+
+In this article, I want to share exactly, how I created a custom hook for drag and drop feature. <br />
+
+So, let's build it!! 🔥
+
+Let me show you the end result of what we will be building.
+![ezgif-4-7bd93a6caeeb.gif](https://cdn.hashnode.com/res/hashnode/image/upload/v1629355307932/lfGrCKLeu.gif)
+
+### Initialize a React Project.
+
+`npx create-react-app drag-and-drop-react --template typescript`
+
+After the project is initialized, let's create a form in App.js.
+
+```js
+import "./App.css";
+
+function App() {
+  return (
+    <div className="container">
+      <form>
+        <label htmlFor="file">
+          <h1>Select Or drop a file</h1>
+        </label>
+        <input type="file" name="file" id="file" />
+      </form>
+    </div>
+  );
+}
+
+export default App;
+```
+
+In the App.css, make the following changes to make it look beautiful, or you can do your own custom styling!
+
+```css
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: #0267c1;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  background: #fff;
+  padding: 3em 5em;
+  border-radius: 0.5em;
+  box-shadow: 0 2.8px 2.2px rgba(0, 0, 0, 0.02), 0 6.7px 5.3px rgba(0, 0, 0, 0.028),
+    0 12.5px 10px rgba(0, 0, 0, 0.035), 0 22.3px 17.9px rgba(0, 0, 0, 0.042),
+    0 41.8px 33.4px rgba(0, 0, 0, 0.05), 0 100px 80px rgba(0, 0, 0, 0.07);
+}
+
+input {
+  display: none;
+}
+
+label {
+  width: 400px;
+  border: 3px #efa00b dashed;
+  padding: 3em 1.78em;
+  display: inline-block;
+  cursor: pointer;
+  font-family: "Noto Sans JP", sans-serif;
+}
+
+label h1 {
+  font-size: 130%;
+  text-align: center;
+  color: #efa00b;
+}
+
+.file-drop-error {
+  width: 100%;
+  text-align: center;
+  color: red;
+  display: inline-block;
+  margin-bottom: 1em;
+}
+
+.file-properties {
+  margin-top: 1em;
+}
+
+.file-properties ul {
+  list-style: none;
+  text-align: center;
+}
+```
+
+### Now, let's create the hook
+
+Create a folder called hooks and inside it create a file **"useDragAndDrop.ts"**. In this file, we will create the necessary state and methods for the drag and drop feature.
+
+First we will create two states **dragOver** and **fileDropError**. DragOver will determine if the file is being dragged over our label element, and fileDropError will contain the error message if there is any error after dropping the file. In this case, we want an image, so the fileDropError will likely store error messages related to file not being of the type image.
+
+```js
+  const [dragOver, setDragOver] = useState(false);
+  const [fileDropError, setFileDropError] = useState(")
+
+```
+
+Next, we will create two function onDragOver() and onDragLeave(), this will the toggle the state of dragOver, and then will return all the states and method.
+
+```js
+const onDragOver = (e: React.SyntheticEvent) => {
+  e.preventDefault();
+  setDragOver(true);
+};
+
+const onDragLeave = () => setDragOver(false);
+```
+
+The final code will look like this.
+
+```js
+import { useState } from "react";
+
+export default function useDragAndDrop() {
+  const [dragOver, setDragOver] = useState(false);
+  const [fileDropError, setFileDropError] = useState("");
+
+  const onDragOver = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    setDragOver(true);
+  };
+
+  const onDragLeave = () => setDragOver(false);
+
+  return {
+    dragOver,
+    setDragOver,
+    onDragOver,
+    onDragLeave,
+    fileDropError,
+    setFileDropError,
+  };
+}
+```
+
+And that's it for this file. Now, let's come back to App.js and implement our hook.
+
+Import useDragAndDrop from the hooks folder. and then destructure all the values from our hook. We will also need a file state to store the file.
+
+```js
+import React, { useState } from "react";
+import "./App.css";
+import useDragAndDrop from "./hooks/useDragAndDrop";
+
+function App() {
+  const [file, setFile] = useState<File>();
+
+  const {
+    dragOver,
+    setDragOver,
+    onDragOver,
+    onDragLeave,
+    fileDropError,
+    setFileDropError,
+  } = useDragAndDrop();
+
+ return (
+    <div className="container">
+      <form>
+        <label htmlFor="file">
+          <h1>Select Or drop a file</h1>
+        </label>
+        <input type="file" name="file" id="file" />
+      </form>
+    </div>
+}
+```
+
+Now let's specify the onDragOver and onDragLeave methods on our label like this. Please note that the onDrop function here is not related to our hook, but will be called when the file is dropped. We will create this function in the App.js itself.
+
+We also add some conditional styling and conditional rendering. This will just change the border styling and the text inside the label once the file is being dragged over the label. (Look in the picture) below
+
+```html
+        <label
+         htmlFor="file"
+         onDragOver={onDragOver}
+         onDragLeave={onDragLeave}
+         onDrop={onDrop}
+         style={{ border: `${dragOver ? "3px dashed yellowgreen" : ""}` }}
+       >
+         {file && <h1>{file.name}</h1>}
+         {!file && (
+           <h1 style={{ color: `${dragOver ? " yellowgreen" : ""}` }}>
+             {!dragOver ? "Select Or Drop your File here..." : "Drop here..."}
+           </h1>
+         )}
+       </label>
+```
+
+![Screenshot from 2021-08-19 12-54-10.png](https://cdn.hashnode.com/res/hashnode/image/upload/v1629357967591/Tut-Xg_dx.png)
+
+Now, we will create the **onDrop()** and **fileSelect()** function for setting the file state after the file is dropped or selected.
+
+```js
+const onDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+  e.preventDefault();
+
+  setDragOver(false);
+
+  const selectedFile = e?.dataTransfer?.files[0];
+
+  if (selectedFile.type.split("/")[0] !== "image") {
+    return setFileDropError("Please provide an image file to upload!");
+  }
+
+  setFile(selectedFile);
+};
+
+const fileSelect = (e: any) => {
+  let selectedFile = e?.dataTransfer?.files[0];
+
+  if (selectedFile.type.split("/")[0] !== "image") {
+    return setFileDropError("Please provide an image file to upload!");
+  }
+
+  setFileDropError("");
+};
+```
+
+Mention the onChange handler on the input element.
+`<input type="file" name="file" id="file" onChange={fileSelect} />`
+
+Also, we need to conditionally render any error we have.
+
+```js
+{
+  fileDropError && <span className="file-drop-error">{fileDropError}</span>;
+}
+```
+
+Final App.js looks like this.
+
+```js
+import React, { useState } from "react";
+import "./App.css";
+import useDragAndDrop from "./hooks/useDragAndDrop";
+
+function App() {
+  const {
+    dragOver,
+    setDragOver,
+    onDragOver,
+    onDragLeave,
+    fileDropError,
+    setFileDropError,
+  } = useDragAndDrop();
+
+  const [file, setFile] = useState<File>();
+
+  const onDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+
+    setDragOver(false);
+
+    const selectedFile = e?.dataTransfer?.files[0];
+
+    if (selectedFile.type.split("/")[0] !== "image") {
+      return setFileDropError("Please provide an image file to upload!");
+    }
+
+    setFile(selectedFile);
+  };
+
+  const fileSelect = (e: any) => {
+    let selectedFile = e?.dataTransfer?.files[0];
+
+    if (selectedFile.type.split("/")[0] !== "image") {
+      return setFileDropError("Please provide an image file to upload!");
+    }
+
+    setFileDropError("");
+  };
+
+  return (
+    <div className="container">
+      <form>
+        {fileDropError && (
+          <span className="file-drop-error">{fileDropError}</span>
+        )}
+        <label
+          htmlFor="file"
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDrop={onDrop}
+          style={{ border: `${dragOver ? "3px dashed yellowgreen" : ""}` }}
+        >
+          {file && <h1>{file.name}</h1>}
+          {!file && (
+            <h1 style={{ color: `${dragOver ? " yellowgreen" : ""}` }}>
+              {!dragOver ? "Select Or Drop your File here..." : "Drop here..."}
+            </h1>
+          )}
+        </label>
+        <input type="file" name="file" id="file" onChange={fileSelect} />
+      </form>
+    </div>
+  );
+}
+
+export default App;
+```
+
+### And That's it we have successfully created custom Drag & Drop hook!
+
+I hope you liked the article and gained some knowledge as well. All the codes used are there in the github repository mentioned below.
+Github Repo - [https://github.com/shaan71845/react-custom-drag-and-drop-hook](https://github.com/shaan71845/react-custom-drag-and-drop-hook)
